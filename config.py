@@ -4,11 +4,14 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'super-secret-worktrack-pro-key'
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + os.path.join(BASE_DIR, 'instance', 'database.db')
+    if os.environ.get('VERCEL'):
+        SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:////tmp/database.db'
+        UPLOAD_FOLDER = '/tmp/uploads'
+    else:
+        SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + os.path.join(BASE_DIR, 'instance', 'database.db')
+        UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')
+        
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-
-    # Uploads configuration
-    UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024 # 16 MB max
 
     # Flask-Mail configuration

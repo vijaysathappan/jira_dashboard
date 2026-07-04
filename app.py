@@ -33,8 +33,12 @@ def create_app(config_class=Config):
     mail.init_app(app)
 
     # Make sure upload folder exists
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    os.makedirs(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'instance'), exist_ok=True)
+    try:
+        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+        if not os.environ.get('VERCEL'):
+            os.makedirs(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'instance'), exist_ok=True)
+    except OSError:
+        pass
 
     with app.app_context():
         from routes import main as main_blueprint
