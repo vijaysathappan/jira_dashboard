@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}My Tasks{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold text-dark">My Dashboard</h3>
+    <div class="text-muted">Welcome back, {{ current_user.name }}!</div>
+</div>
+
+<!-- Key Metrics Cards -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-white border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="text-muted fw-bold mb-0 text-uppercase">Pending</h6>
+                    <div class="bg-warning bg-opacity-10 text-warning rounded-circle p-2">
+                        <i class="bi bi-hourglass-split fs-5"></i>
+                    </div>
+                </div>
+                <h2 class="fw-bold mb-0">{{ pending }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-white border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="text-muted fw-bold mb-0 text-uppercase">In Progress</h6>
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2">
+                        <i class="bi bi-play-circle fs-5"></i>
+                    </div>
+                </div>
+                <h2 class="fw-bold mb-0">{{ in_progress }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-white border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="text-muted fw-bold mb-0 text-uppercase">Completed</h6>
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle p-2">
+                        <i class="bi bi-check-circle fs-5"></i>
+                    </div>
+                </div>
+                <h2 class="fw-bold mb-0">{{ completed }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- My Tasks List -->
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body">
+                <h5 class="fw-bold mb-4">Assigned to Me</h5>
+                {% if tasks %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Task ID</th>
+                                <th>Title</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Due Date</th>
+                                <th>Progress</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in tasks %}
+                            <tr>
+                                <td><span class="fw-bold text-muted">{{ task.task_id }}</span></td>
+                                <td>{{ task.title }}</td>
+                                <td>
+                                    <span class="badge badge-priority-{{ task.priority }}">{{ task.priority }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-status-{{ task.status|replace(' ', '') }}">{{ task.status }}</span>
+                                </td>
+                                <td>
+                                    {{ task.due_date.strftime('%Y-%m-%d') }}
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                                            <div class="progress-bar progress-bar-custom" role="progressbar" style="width: {{ task.completion_percentage }}%;"></div>
+                                        </div>
+                                        <small>{{ task.completion_percentage }}%</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('main.task_details', task_id=task.id) }}" class="btn btn-sm btn-primary rounded-pill px-3">Update</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-emoji-smile fs-1 mb-3 d-block"></i>
+                    <h5>You're all caught up!</h5>
+                    <p>No tasks currently assigned to you.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

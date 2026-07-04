@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block title %}Manager Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold text-dark">Dashboard Overview</h3>
+    <a href="{{ url_for('main.new_task') }}" class="btn btn-primary rounded-pill px-4 shadow-sm">
+        <i class="bi bi-plus-lg me-2"></i>New Task
+    </a>
+</div>
+
+<!-- Key Metrics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-white border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="text-muted fw-bold mb-0 text-uppercase">Total Tasks</h6>
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2">
+                        <i class="bi bi-list-task fs-5"></i>
+                    </div>
+                </div>
+                <h2 class="fw-bold mb-0">{{ total }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-white border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="text-muted fw-bold mb-0 text-uppercase">Completed</h6>
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle p-2">
+                        <i class="bi bi-check-circle fs-5"></i>
+                    </div>
+                </div>
+                <h2 class="fw-bold mb-0">{{ completed }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-white border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="text-muted fw-bold mb-0 text-uppercase">Pending</h6>
+                    <div class="bg-warning bg-opacity-10 text-warning rounded-circle p-2">
+                        <i class="bi bi-hourglass-split fs-5"></i>
+                    </div>
+                </div>
+                <h2 class="fw-bold mb-0">{{ pending }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-white border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="text-muted fw-bold mb-0 text-uppercase">Overdue</h6>
+                    <div class="bg-danger bg-opacity-10 text-danger rounded-circle p-2">
+                        <i class="bi bi-exclamation-triangle fs-5"></i>
+                    </div>
+                </div>
+                <h2 class="fw-bold mb-0">{{ overdue }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Chart Section -->
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+                <h5 class="fw-bold mb-4">Task Status Distribution</h5>
+                <div style="height: 250px;">
+                    <canvas id="taskStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Updates Section -->
+    <div class="col-md-8 mb-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+                <h5 class="fw-bold mb-4">Today's Updates</h5>
+                {% if recent_updates %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Employee</th>
+                                <th>Task</th>
+                                <th>Hours</th>
+                                <th>Progress</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for update in recent_updates %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center me-2" style="width: 30px; height: 30px; font-size: 0.8rem;">
+                                            {{ update.employee.name[0]|upper }}
+                                        </div>
+                                        {{ update.employee.name }}
+                                    </div>
+                                </td>
+                                <td><a href="{{ url_for('main.task_details', task_id=update.task.id) }}" class="text-decoration-none fw-bold">{{ update.task.task_id }}</a></td>
+                                <td>{{ update.hours }}h</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                                            <div class="progress-bar progress-bar-custom" role="progressbar" style="width: {{ update.completion }}%;"></div>
+                                        </div>
+                                        <small>{{ update.completion }}%</small>
+                                    </div>
+                                </td>
+                                <td><small class="text-muted">{{ update.date.strftime('%b %d') }}</small></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-inbox fs-2 mb-2 d-block"></i>
+                    No updates today
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- All Tasks -->
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body">
+                <h5 class="fw-bold mb-4">All Tasks</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Assignee</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Due Date</th>
+                                <th>Progress</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in tasks %}
+                            <tr>
+                                <td><span class="fw-bold text-muted">{{ task.task_id }}</span></td>
+                                <td>{{ task.title }}</td>
+                                <td>{{ task.assignee.name }}</td>
+                                <td>
+                                    <span class="badge badge-priority-{{ task.priority }}">{{ task.priority }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-status-{{ task.status|replace(' ', '') }}">{{ task.status }}</span>
+                                </td>
+                                <td>
+                                    {% if task.due_date < datetime.utcnow() and task.status != 'Completed' %}
+                                        <span class="text-danger fw-bold"><i class="bi bi-exclamation-circle me-1"></i>{{ task.due_date.strftime('%Y-%m-%d') }}</span>
+                                    {% else %}
+                                        {{ task.due_date.strftime('%Y-%m-%d') }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="progress" style="height: 6px;">
+                                        <div class="progress-bar progress-bar-custom" role="progressbar" style="width: {{ task.completion_percentage }}%;"></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('main.task_details', task_id=task.id) }}" class="btn btn-sm btn-outline-primary rounded-pill">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
