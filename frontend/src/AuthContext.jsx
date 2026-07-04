@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Configure axios for credentials
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = 'http://localhost:5000/api';
+axios.defaults.baseURL = import.meta.env.PROD ? '/api' : 'http://localhost:5000/api';
 
 const AuthContext = createContext();
 

@@ -150,7 +150,7 @@ const TaskDetails = () => {
                   {attachments.map(a => (
                     <div key={a.id} className="d-flex align-items-center p-2 bg-light rounded" style={{ border: '1px solid var(--border-color)' }}>
                       <i className="bi bi-file-earmark-pdf-fill text-danger me-2 fs-4"></i>
-                      <a href={`http://localhost:5000/static/${a.filepath}`} target="_blank" rel="noreferrer" className="text-decoration-none fw-bold" style={{ color: 'var(--jira-blue)', fontSize: '0.9rem' }}>
+                      <a href={import.meta.env.PROD ? `/api/${a.filepath}` : `http://localhost:5000/static/${a.filepath}`} target="_blank" rel="noreferrer" className="text-decoration-none fw-bold" style={{ color: 'var(--jira-blue)', fontSize: '0.9rem' }}>
                         {a.filename}
                       </a>
                     </div>

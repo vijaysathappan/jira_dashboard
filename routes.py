@@ -246,6 +246,11 @@ def upload_attachment(task_id):
     save_attachment(task_id, file, current_app.config['UPLOAD_FOLDER'])
     return jsonify({'message': 'Attachment uploaded successfully'})
 
+@main.route("/api/uploads/<path:filename>", methods=['GET'])
+def get_attachment(filename):
+    from flask import send_from_directory
+    return send_from_directory(current_app.config['UPLOAD_FOLDER'], filename)
+
 @main.route("/api/help", methods=['POST'])
 @login_required
 def help_manager():
